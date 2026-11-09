@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MoneyPrinterTurbo × Claude Code — Hướng dẫn khai thác toàn diện</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #161a21; --panel2: #1c212a; --line: #2a303b;
+    --text: #e6e8ec; --muted: #9aa3b2; --accent: #e8915a; --accent2: #6cb6ff;
+    --ok: #5fcf8a; --warn: #f0c050; --danger: #ef6b6b;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f7f6f3; --panel:#ffffff; --panel2:#f1efe9; --line:#e2ded5; --text:#1f2328; --muted:#5d6470; --accent:#c4602a; --accent2:#1f6fd1; --ok:#1d8a4a; --warn:#9a6a00; --danger:#c03535; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "Be Vietnam Pro", sans-serif; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .layout { display:grid; grid-template-columns: 270px 1fr; min-height:100vh; }
+  nav { position:sticky; top:0; height:100vh; overflow:auto; padding:24px 18px; border-right:1px solid var(--line); background:var(--panel); }
+  nav .brand { font-weight:700; font-size:17px; margin-bottom:4px; }
+  nav .brand span { color:var(--accent); }
+  nav .sub { color:var(--muted); font-size:13px; margin-bottom:18px; }
+  nav ol { list-style:none; padding:0; margin:0; counter-reset: s; }
+  nav li a { display:block; padding:6px 10px; border-radius:6px; color:var(--text); font-size:14px; }
+  nav li a::before { counter-increment: s; content: counter(s) ". "; color:var(--muted); }
+  nav li a:hover, nav li a.active { background:var(--panel2); text-decoration:none; }
+  nav li a.active { color: var(--accent); }
+  main { max-width: 960px; padding: 40px 48px 120px; }
+  header.hero { padding: 8px 0 28px; border-bottom:1px solid var(--line); margin-bottom: 12px; }
+  header.hero h1 { font-size: 34px; line-height:1.2; margin: 0 0 10px; }
+  header.hero h1 em { font-style:normal; color: var(--accent); }
+  header.hero p { color: var(--muted); font-size: 17px; margin: 0; max-width: 720px; }
+  .badges { margin-top: 16px; display:flex; flex-wrap:wrap; gap:8px; }
+  .badge { font-size:12px; padding:3px 10px; border:1px solid var(--line); border-radius:999px; color:var(--muted); background:var(--panel); }
+  section { padding-top: 28px; }
+  h2 { font-size: 25px; margin: 22px 0 10px; padding-top: 10px; }
+  h2 .num { color: var(--accent); margin-right: 8px; }
+  h3 { font-size: 18px; margin: 24px 0 8px; }
+  p, li { color: var(--text); }
+  .muted { color: var(--muted); }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--panel2); border: 1px solid var(--line); padding: 1px 5px; border-radius: 4px; }
+  pre { position: relative; font-family: var(--mono); font-size: 13.5px; line-height:1.55; background: var(--panel); border:1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow:auto; margin: 10px 0 16px; }
+  pre code { background:none; border:0; padding:0; font-size:inherit; }
+  pre .label { position:absolute; top:0; left:12px; transform: translateY(-50%); font-size:11px; background:var(--bg); color:var(--muted); padding:0 6px; border:1px solid var(--line); border-radius:4px; font-family: system-ui, sans-serif; }
+  .copy { position:absolute; top:8px; right:8px; font: 12px system-ui, sans-serif; color: var(--muted); background: var(--panel2); border:1px solid var(--line); border-radius: 5px; padding: 3px 9px; cursor:pointer; opacity:.85; }
+  .copy:hover { opacity:1; color: var(--text); }
+  pre.prompt { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(232,145,90,.07), transparent 60%), var(--panel); white-space: pre-wrap; font-family: system-ui, sans-serif; font-size: 15px; }
+  table { width:100%; border-collapse: collapse; margin: 10px 0 18px; font-size: 14.5px; }
+  th, td { text-align:left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight:600; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }
+  .callout { border:1px solid var(--line); border-left: 4px solid var(--accent2); background: var(--panel); border-radius: 8px; padding: 12px 16px; margin: 14px 0; }
+  .callout.warn { border-left-color: var(--warn); }
+  .callout.danger { border-left-color: var(--danger); }
+  .callout.ok { border-left-color: var(--ok); }
+  .callout strong:first-child { display:block; margin-bottom: 2px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 14px 0; }
+  .card { background: var(--panel); border:1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .card h4 { margin: 0 0 6px; font-size: 16px; }
+  .card p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .card .tag { display:inline-block; font-size:11px; color: var(--accent); border:1px solid var(--accent); border-radius: 4px; padding: 0 6px; margin-bottom: 6px; }
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin: 12px 0 18px; }
+  .flow span { background: var(--panel); border:1px solid var(--line); border-radius: 6px; padding: 5px 10px; font-family: var(--mono); font-size: 13px; }
+  .flow i { color: var(--muted); font-style: normal; }
+  .steps { counter-reset: st; list-style: none; padding-left: 0; }
+  .steps > li { position: relative; padding-left: 40px; margin-bottom: 14px; }
+  .steps > li::before { counter-increment: st; content: counter(st); position:absolute; left:0; top:0; width:28px; height:28px; border-radius:50%; background: var(--accent); color: #fff; font-weight:700; display:grid; place-items:center; font-size: 14px; }
+  footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  .menu-btn { display:none; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav { position: fixed; z-index: 10; left:0; top:0; width: 280px; transform: translateX(-100%); transition: transform .2s; box-shadow: 0 0 40px rgba(0,0,0,.4); }
+    nav.open { transform: none; }
+    .menu-btn { display:block; position: fixed; z-index: 11; right: 14px; bottom: 14px; background: var(--accent); color:#fff; border:0; border-radius: 999px; padding: 10px 16px; font-weight:600; }
+    main { padding: 24px 18px 100px; }
+    header.hero h1 { font-size: 27px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+<nav id="nav">
+  <div class="brand">MoneyPrinter<span>Turbo</span> × Claude Code</div>
+  <div class="sub">Hướng dẫn khai thác toàn diện</div>
+  <ol>
+    <li><a href="#tong-quan">Tổng quan</a></li>
+    <li><a href="#chuan-bi">Chuẩn bị</a></li>
+    <li><a href="#skill">Cách nhanh nhất: Skill</a></li>
+    <li><a href="#cli">Điều khiển CLI</a></li>
+    <li><a href="#pipeline">Pipeline &amp; --stop-at</a></li>
+    <li><a href="#batch">Sản xuất hàng loạt</a></li>
+    <li><a href="#claude-llm">Dùng gói Claude làm LLM</a></li>
+    <li><a href="#llm">Các nhà cung cấp LLM khác</a></li>
+    <li><a href="#footage">Nguồn hình ảnh / video</a></li>
+    <li><a href="#audio">Giọng đọc &amp; nhạc nền</a></li>
+    <li><a href="#subtitle">Phụ đề</a></li>
+    <li><a href="#webui-api">WebUI &amp; REST API</a></li>
+    <li><a href="#publish">Đăng TikTok / IG / YouTube</a></li>
+    <li><a href="#projects">Dự án video có phiên bản</a></li>
+    <li><a href="#power">Tối ưu Claude Code</a></li>
+    <li><a href="#troubleshoot">Khắc phục sự cố</a></li>
+    <li><a href="#security">Bảo mật &amp; chi phí</a></li>
+    <li><a href="#prompts">Thư viện prompt</a></li>
+  </ol>
+</nav>
+<button class="menu-btn" onclick="document.getElementById('nav').classList.toggle('open')">☰ Mục lục</button>
+
+<main>
+<header class="hero">
+  <h1>Biến <em>Claude Code</em> thành xưởng sản xuất video ngắn với MoneyPrinterTurbo</h1>
+  <p>MoneyPrinterTurbo (MPT) nhận một <b>chủ đề</b> rồi tự động viết kịch bản, tìm footage, lồng tiếng, tạo phụ đề, ghép nhạc nền và xuất video HD. Trang này chỉ cách giao toàn bộ quy trình đó cho Claude Code: cài đặt, cấu hình, tạo video, chạy hàng loạt, sửa lỗi và đăng lên mạng xã hội.</p>
+  <div class="badges">
+    <span class="badge">Dựa trên mã nguồn v1.3.10</span>
+    <span class="badge">Python 3.11+ · uv · FFmpeg</span>
+    <span class="badge">CLI · API · WebUI · Skill</span>
+  </div>
+</header>
+
+<!-- 1 -->
+<section id="tong-quan">
+<h2><span class="num">1</span>Tổng quan: Claude Code giúp được gì?</h2>
+<p>Claude Code có thể tham gia MoneyPrinterTurbo theo <b>hai vai trò</b>, dùng riêng hoặc kết hợp:</p>
+<div class="grid">
+  <div class="card"><span class="tag">Vai trò A</span><h4>Người vận hành (agent)</h4><p>Claude Code đọc repo, cài môi trường, sửa <code>config.toml</code>, chạy <code>cli.py</code> hoặc gọi API, chờ kết quả, đọc log khi lỗi và trả về đường dẫn file MP4.</p></div>
+  <div class="card"><span class="tag">Vai trò B</span><h4>Bộ não viết kịch bản (LLM)</h4><p>Provider <code>claude_code</code> cho phép MPT gọi <code>claude -p</code> để viết kịch bản bằng gói Claude Pro/Max/Team của bạn, không cần API key.</p></div>
+</div>
+<p>MPT có 4 cách sử dụng. Với Claude Code, nên ưu tiên theo thứ tự này:</p>
+<table>
+  <tr><th>Cách</th><th>Khi nào dùng</th><th>Claude Code làm gì</th></tr>
+  <tr><td><b>Skill</b> (<code>docs/skill</code>)</td><td>Muốn có video nhanh nhất, không cần biết kỹ thuật</td><td>Chạy <code>mpt_agent.py</code>: tự cài đặt, hỏi key còn thiếu, trả về MP4</td></tr>
+  <tr><td><b>CLI</b> (<code>cli.py</code>)</td><td>Cần kiểm soát mọi tham số, chạy hàng loạt, tự động hoá</td><td>Ghép lệnh từ yêu cầu của bạn, chạy, đọc JSON kết quả</td></tr>
+  <tr><td><b>REST API</b> (<code>main.py</code>)</td><td>Tích hợp n8n, bot, backend khác</td><td>Khởi động server, gọi <code>/api/v1/videos</code>, theo dõi task</td></tr>
+  <tr><td><b>WebUI</b> (Streamlit)</td><td>Muốn xem trước, chỉnh bằng giao diện</td><td>Khởi chạy, cấu hình sẵn; bạn thao tác trên trình duyệt</td></tr>
+</table>
+</section>
+
+<!-- 2 -->
+<section id="chuan-bi">
+<h2><span class="num">2</span>Chuẩn bị</h2>
+<ol class="steps">
+  <li><b>Cài Claude Code</b> và đăng nhập (<code>claude</code> trong terminal). Tài liệu: <a href="https://code.claude.com/docs">code.claude.com/docs</a>.</li>
+  <li><b>Lấy mã nguồn.</b> Clone repo rồi mở Claude Code trong thư mục đó:
+<pre><code>git clone https://github.com/harry0703/MoneyPrinterTurbo.git
+cd MoneyPrinterTurbo
+claude</code></pre>
+  Hoặc cài gói pip chính chủ <code>mpt</code> (không cần clone): <code>python -m pip install mpt</code>, sau đó dùng <code>mpt webui</code> / <code>mpt cli --help</code>.</li>
+  <li><b>Giao việc cài đặt cho Claude:</b>
+<pre class="prompt"><button class="copy">Sao chép</button>Đọc README-en.md và pyproject.toml. Cài môi trường bằng uv (Python 3.11, uv sync --frozen), kiểm tra FFmpeg đã có chưa, rồi chạy `uv run python cli.py --help` để xác nhận mọi thứ hoạt động. Đừng tự sửa config.toml khi chưa hỏi tôi.</pre></li>
+  <li><b>Chuẩn bị API key</b> tối thiểu: một LLM (hoặc dùng gói Claude, xem <a href="#claude-llm">mục 7</a>) và một nguồn footage (ví dụ <a href="https://www.pexels.com/api/">Pexels</a>, miễn phí). Giọng đọc Edge TTS miễn phí, không cần key.</li>
+</ol>
+<div class="callout"><strong>Lần chạy đầu</strong>MPT tự tạo <code>config.toml</code> từ <code>config.example.toml</code>. File này chứa toàn bộ cấu hình và key, <b>không bao giờ commit</b> nó lên git.</div>
+<table>
+  <tr><th>Yêu cầu</th><th>Tối thiểu</th><th>Khuyến nghị</th></tr>
+  <tr><td>CPU</td><td>4 nhân</td><td>6–8 nhân trở lên</td></tr>
+  <tr><td>RAM</td><td>4 GB</td><td>8–16 GB</td></tr>
+  <tr><td>GPU</td><td>Không bắt buộc</td><td>4–8 GB VRAM (nhanh hơn khi dùng Whisper hoặc chạy batch)</td></tr>
+</table>
+</section>
+
+<!-- 3 -->
+<section id="skill">
+<h2><span class="num">3</span>Cách nhanh nhất: dùng Skill có sẵn</h2>
+<p>Repo có sẵn một Agent Skill tại <code>docs/skill/SKILL.md</code>, kèm script hỗ trợ <code>mpt_agent.py</code>. Skill này hướng dẫn agent tự cài MPT vào <code>~/MoneyPrinterTurbo</code>, dùng lại cấu hình sẵn có, chạy CLI, chờ xong và trả về file MP4. Skill chính thức hỗ trợ <b>macOS và Windows</b>.</p>
+
+<h3>3.1 Dùng ngay qua URL</h3>
+<pre class="prompt"><button class="copy">Sao chép</button>Use this Skill: https://raw.githubusercontent.com/harry0703/MoneyPrinterTurbo/main/docs/skill/SKILL.md
+Tạo một video tiếng Việt, khổ dọc 9:16, chủ đề "5 thói quen buổi sáng giúp bạn làm việc hiệu quả", giọng vi-VN-HoaiMyNeural-Female, có phụ đề và nhạc nền.</pre>
+
+<h3>3.2 Cài Skill vĩnh viễn vào Claude Code</h3>
+<p>Chép thư mục Skill vào thư mục skills cá nhân để Claude tự nhận diện mỗi khi bạn nhắc tới việc làm video:</p>
+<pre><span class="label">macOS / Linux</span><button class="copy">Sao chép</button><code>mkdir -p ~/.claude/skills/moneyprinterturbo-video
+cp docs/skill/SKILL.md docs/skill/mpt_agent.py ~/.claude/skills/moneyprinterturbo-video/</code></pre>
+<p>Muốn cả team dùng chung thì đặt vào <code>.claude/skills/moneyprinterturbo-video/</code> trong repo dự án. Sau đó chỉ cần nói: <i>“Làm cho tôi video về chủ đề …”</i>.</p>
+
+<h3>3.3 Skill hoạt động thế nào</h3>
+<div class="flow"><span>uv run … mpt_agent.py --subject "…"</span><i>→</i><span>exit 0: MPT_RESULT</span><i>|</i><span>exit 10: MPT_NEEDS_INPUT</span><i>|</i><span>exit 1: MPT_ERROR</span></div>
+<table>
+  <tr><th>Mã thoát</th><th>Ý nghĩa</th><th>Claude Code sẽ</th></tr>
+  <tr><td><code>0</code></td><td>Thành công, in ra <code>VIDEO_FILE</code>, <code>TASK_DIR</code>, <code>LOG_FILE</code></td><td>Trả bạn đường dẫn MP4</td></tr>
+  <tr><td><code>10</code></td><td>Thiếu key, kèm danh sách cần cung cấp</td><td>Hỏi bạn <b>một lần</b> tất cả key thiếu, rồi chạy lại bằng biến môi trường <code>MPT_*</code></td></tr>
+  <tr><td><code>1</code></td><td>Lỗi trong quá trình tạo</td><td>Đọc phần cuối log, sửa nếu được và thử lại một lần</td></tr>
+</table>
+<p>Biến môi trường mà Skill nhận: <code>MPT_LLM_PROVIDER</code>, <code>MPT_LLM_API_KEY</code>, <code>MPT_LLM_BASE_URL</code>, <code>MPT_LLM_MODEL_NAME</code>, <code>MPT_PEXELS_API_KEY</code>, <code>MPT_VOLCENGINE_ARK_API_KEY</code>, <code>MPT_OFOX_API_KEY</code>, <code>MPT_METASO_MINIMAX_API_KEY</code>, <code>MPT_MUAPI_API_KEY</code>, <code>MPT_INFISTAR_VIDEO_API_KEY</code>, <code>MPT_JALAPENO_VIDEO_API_KEY</code>.</p>
+<p>Yêu cầu nâng cao (khổ video, nguồn footage, giọng…) được truyền sau dấu <code>--</code> dưới dạng tham số của <code>cli.py</code>:</p>
+<pre><button class="copy">Sao chép</button><code>uv run --no-project --python 3.11 python mpt_agent.py --subject "Lịch sử cà phê Việt Nam" -- \
+  --video-language vi --voice-name vi-VN-NamMinhNeural-Male --video-aspect 16:9</code></pre>
+<div class="callout warn"><strong>Nguồn video AI trả phí</strong>Với Seedance, WaveSpeed, OFox, Metaso MiniMax, MuAPI, Infistar, Jalapeno… Skill sẽ dừng và hỏi bạn xác nhận chi phí. Claude chỉ thêm cờ <code>--confirm-…-charge</code> sau khi <b>bạn</b> đồng ý rõ ràng.</div>
+<div class="callout"><strong>Lưu ý về key</strong>Thay vì dán key vào khung chat, bạn có thể tự điền key vào <code>config.toml</code> (hoặc qua WebUI). Skill sẽ dùng lại key có sẵn và không hỏi nữa.</div>
+</section>
+
+<!-- 4 -->
+<section id="cli">
+<h2><span class="num">4</span>Điều khiển trực tiếp bằng CLI</h2>
+<p>CLI là giao diện mạnh nhất để Claude Code điều khiển: mọi tham số đều có cờ dòng lệnh, kết quả in ra dạng <b>một đối tượng JSON</b> trên stdout (log nằm ở stderr), file đầu ra nằm ở <code>storage/tasks/&lt;task-id&gt;/</code>.</p>
+<pre><button class="copy">Sao chép</button><code>uv run python cli.py --video-subject "Vì sao giấc ngủ quan trọng" \
+  --video-language vi --voice-name vi-VN-HoaiMyNeural-Female \
+  --font-name BeVietnamPro-Bold.ttf --video-aspect 9:16</code></pre>
+<p>Thứ tự ưu tiên giá trị: <b>cờ CLI &gt; giá trị đã lưu trong <code>[ui]</code> của <code>config.toml</code> &gt; mặc định</b> (áp dụng cho phụ đề và giọng đọc).</p>
+
+<h3>Bảng tham số đầy đủ</h3>
+<table>
+  <tr><th>Nhóm</th><th>Cờ</th><th>Ghi chú</th></tr>
+  <tr><td rowspan="6">Kịch bản</td><td><code>--video-subject</code></td><td>Chủ đề (bắt buộc nếu không có <code>--video-script</code>)</td></tr>
+  <tr><td><code>--video-script</code></td><td>Kịch bản viết sẵn, bỏ qua bước LLM</td></tr>
+  <tr><td><code>--video-terms</code></td><td>Từ khoá tìm footage, phân tách bằng dấu phẩy</td></tr>
+  <tr><td><code>--video-language</code></td><td>Ví dụ <code>vi</code>, <code>en</code>; để trống thì tự nhận diện</td></tr>
+  <tr><td><code>--paragraph-number</code></td><td>Số đoạn kịch bản, từ 1 đến 10</td></tr>
+  <tr><td><code>--video-script-prompt</code> / <code>--custom-system-prompt</code></td><td>Thêm yêu cầu cho LLM, hoặc thay system prompt mặc định</td></tr>
+  <tr><td rowspan="4">Footage</td><td><code>--video-source</code></td><td>Xem <a href="#footage">mục 9</a></td></tr>
+  <tr><td><code>--video-materials</code></td><td>Đường dẫn ảnh/video local (khi <code>--video-source local</code>)</td></tr>
+  <tr><td><code>--match-materials-to-script</code></td><td>Giữ đúng thứ tự từ khoá theo kịch bản</td></tr>
+  <tr><td><code>--confirm-*-charge</code></td><td>Xác nhận chi phí với nguồn AI trả phí</td></tr>
+  <tr><td rowspan="8">Video</td><td><code>--video-count</code></td><td>Số biến thể đầu ra</td></tr>
+  <tr><td><code>--video-aspect</code></td><td><code>9:16</code> (1080×1920) · <code>16:9</code> (1920×1080) · <code>1:1</code></td></tr>
+  <tr><td><code>--video-fit-mode</code></td><td><code>cover</code> (cắt cho đầy khung) / <code>contain</code> (giữ nguyên, thêm viền)</td></tr>
+  <tr><td><code>--video-concat-mode</code></td><td><code>random</code> / <code>sequential</code></td></tr>
+  <tr><td><code>--video-transition-mode</code></td><td><code>none, shuffle, fade-in, fade-out, slide-in, slide-out</code></td></tr>
+  <tr><td><code>--image-motion</code></td><td><code>static</code> / <code>zoom</code> (hiệu ứng cho ảnh tĩnh)</td></tr>
+  <tr><td><code>--video-clip-duration</code> / <code>--video-clip-speed</code></td><td>Thời lượng tối đa mỗi clip (giây) / tốc độ 0.5–2.0</td></tr>
+  <tr><td><code>--n-threads</code></td><td>Số luồng FFmpeg</td></tr>
+  <tr><td rowspan="5">Âm thanh</td><td><code>--voice-name</code></td><td>Giọng TTS, hoặc <code>no-voice</code> để không lồng tiếng</td></tr>
+  <tr><td><code>--voice-volume</code> / <code>--voice-rate</code></td><td>Âm lượng / tốc độ đọc</td></tr>
+  <tr><td><code>--custom-audio-file</code></td><td>Dùng file thu âm sẵn thay cho TTS</td></tr>
+  <tr><td><code>--bgm-type</code></td><td><code>none, random, custom, sonilo, elevenlabs</code></td></tr>
+  <tr><td><code>--bgm-file</code> / <code>--bgm-volume</code> / <code>--video-music-prompt</code></td><td>File nhạc, âm lượng (mặc định 0.2), prompt cho nhạc AI</td></tr>
+  <tr><td rowspan="5">Phụ đề</td><td><code>--subtitle-enabled</code> / <code>--no-subtitle-enabled</code></td><td>Bật hoặc tắt phụ đề</td></tr>
+  <tr><td><code>--subtitle-position</code></td><td><code>top, center, bottom, two_thirds_bottom, custom</code> (+ <code>--custom-position</code>)</td></tr>
+  <tr><td><code>--subtitle-display-mode</code></td><td><code>sentence</code> / <code>word_by_word</code></td></tr>
+  <tr><td><code>--subtitle-animation</code></td><td><code>none</code> / <code>pop_spring</code></td></tr>
+  <tr><td><code>--font-name</code>, <code>--font-size</code>, <code>--text-fore-color</code>, <code>--stroke-*</code>, <code>--subtitle-background-*</code></td><td>Kiểu chữ, viền, nền phụ đề</td></tr>
+  <tr><td>Khác</td><td><code>--task-id</code>, <code>--batch-file</code>, <code>--stop-at</code></td><td>Xem các mục kế tiếp</td></tr>
+</table>
+<pre class="prompt"><button class="copy">Sao chép</button>Chạy `uv run python cli.py --help` để nắm đầy đủ tham số, rồi tạo video tiếng Việt khổ dọc về "Mẹo tiết kiệm tiền cho sinh viên": 3 đoạn kịch bản, giọng nam vi-VN-NamMinhNeural-Male, phụ đề hiện từng từ với hiệu ứng pop_spring, font BeVietnamPro-Bold.ttf, chuyển cảnh fade-in, tạo 2 biến thể. Khi xong, cho tôi đường dẫn các file MP4.</pre>
+</section>
+
+<!-- 5 -->
+<section id="pipeline">
+<h2><span class="num">5</span>Pipeline và chạy từng bước với <code>--stop-at</code></h2>
+<div class="flow"><span>script</span><i>→</i><span>terms</span><i>→</i><span>audio</span><i>→</i><span>subtitle</span><i>→</i><span>materials</span><i>→</i><span>video</span></div>
+<p><code>--stop-at &lt;stage&gt;</code> dừng ngay sau bước đã chọn và in kết quả của bước đó. Cách này rất hợp với Claude Code: duyệt kịch bản trước, chỉnh sửa, rồi mới tốn thời gian render.</p>
+<pre class="prompt"><button class="copy">Sao chép</button>Bước 1: chạy cli.py với --stop-at script cho chủ đề "Bí quyết chụp ảnh đẹp bằng điện thoại" (tiếng Việt). Cho tôi xem kịch bản.
+Bước 2: sau khi tôi duyệt và sửa, chạy lại toàn bộ với --video-script "<kịch bản đã sửa>" để xuất video.</pre>
+<table>
+  <tr><th>Mã thoát CLI</th><th>Ý nghĩa</th></tr>
+  <tr><td><code>0</code></td><td>Thành công, in một đối tượng JSON trên stdout</td></tr>
+  <tr><td><code>1</code></td><td>Task bị lỗi khi chạy</td></tr>
+  <tr><td><code>2</code></td><td>Sai tham số hoặc manifest; dừng trước khi bắt đầu</td></tr>
+</table>
+</section>
+
+<!-- 6 -->
+<section id="batch">
+<h2><span class="num">6</span>Sản xuất hàng loạt với <code>--batch-file</code></h2>
+<p>Truyền một file JSON (mảng) hoặc JSONL. Cờ CLI đóng vai trò giá trị mặc định, mỗi object ghi đè các trường của <code>VideoParams</code>. Giới hạn: 100 task và 1 MiB mỗi manifest. Mọi task được kiểm tra hợp lệ trước khi chạy, task lỗi không làm dừng các task còn lại, cuối cùng in một bản tóm tắt JSON (<code>total</code>, <code>succeeded</code>, <code>failed</code>, <code>tasks</code>).</p>
+<pre><span class="label">tasks.jsonl</span><button class="copy">Sao chép</button><code>{"video_subject": "Lợi ích của việc đọc sách mỗi ngày"}
+{"video_subject": "Cách pha cà phê phin chuẩn vị", "video_aspect": "16:9"}
+{"video_subject": "3 địa điểm du lịch Đà Lạt", "voice_name": "vi-VN-NamMinhNeural-Male"}</code></pre>
+<pre><button class="copy">Sao chép</button><code>uv run python cli.py --batch-file ./tasks.jsonl --video-language vi \
+  --voice-name vi-VN-HoaiMyNeural-Female --font-name BeVietnamPro-Bold.ttf</code></pre>
+<pre class="prompt"><button class="copy">Sao chép</button>Lên ý tưởng 20 chủ đề video ngắn cho kênh TikTok về tài chính cá nhân, ghi thành tasks.jsonl (mỗi dòng một video_subject, tiếng Việt). Chạy cli.py --batch-file với giọng vi-VN-HoaiMyNeural-Female, rồi tổng hợp bảng: chủ đề, trạng thái, đường dẫn video, lỗi (nếu có). Task nào lỗi thì phân tích nguyên nhân và chạy lại riêng.</pre>
+<div class="callout"><strong>Đường dẫn tương đối</strong><code>custom_audio_file</code> và <code>video_materials[].url</code> trong manifest được tính theo thư mục chứa manifest. Đường dẫn truyền bằng cờ CLI thì tính theo thư mục hiện tại.</div>
+</section>
+
+<!-- 7 -->
+<section id="claude-llm">
+<h2><span class="num">7</span>Dùng gói Claude (Pro / Max / Team) làm LLM viết kịch bản</h2>
+<p>Gói thuê bao Claude không cấp API key, nên MPT có sẵn provider <code>claude_code</code>. Provider này gọi <code>claude -p</code> ở chế độ headless (tắt mọi công cụ, CLAUDE.md, skills, hooks và MCP) và tính vào hạn mức gói thuê bao của bạn. Cần Claude Code CLI phiên bản <b>2.1.260 trở lên</b>.</p>
+<h3>7.1 Chạy trực tiếp trên máy</h3>
+<pre><span class="label">config.toml → [app]</span><button class="copy">Sao chép</button><code>llm_provider = "claude_code"
+claude_code_model_name = ""   # để trống = model mặc định của CLI; hoặc "claude-sonnet-5", "claude-opus-5"
+claude_code_cli_path = ""     # để trống = tìm `claude` trong PATH
+claude_code_timeout = ""      # để trống = 300 giây</code></pre>
+<p>Chỉ cần <code>claude</code> đã đăng nhập trên máy. Bạn cũng có thể chọn <b>“Claude Code (Claude subscription)”</b> trong phần cài đặt LLM của WebUI.</p>
+<h3>7.2 Chạy bằng Docker</h3>
+<p>Trong container không có keychain, nên phải dùng token dài hạn. Repo đã có sẵn <code>Dockerfile.claude</code> (cài Node 22 và <code>@anthropic-ai/claude-code</code>) cùng <code>docker-compose.claude.yml</code>:</p>
+<pre><button class="copy">Sao chép</button><code>export CLAUDE_CODE_OAUTH_TOKEN="$(claude setup-token)"
+docker compose -f docker-compose.claude.yml up -d --build
+# WebUI: http://127.0.0.1:8501   ·   API: http://127.0.0.1:8080/docs</code></pre>
+<div class="callout warn"><strong>Biến môi trường xung đột</strong>Trước khi gọi CLI, MPT tự xoá các biến <code>ANTHROPIC_*</code> và <code>CLAUDE_CODE_USE_*</code> để chắc chắn dùng gói thuê bao. Nếu muốn trả theo API key, hãy dùng provider <code>anthropic</code> với <code>anthropic_api_key</code>.</div>
+</section>
+
+<!-- 8 -->
+<section id="llm">
+<h2><span class="num">8</span>Các nhà cung cấp LLM khác</h2>
+<p>Đặt <code>llm_provider</code> trong <code>config.toml</code> và điền key tương ứng (<code>&lt;provider&gt;_api_key</code>, có thể kèm <code>_model_name</code> và <code>_base_url</code>). Một số provider phổ biến:</p>
+<div class="grid">
+  <div class="card"><h4>Trả theo API</h4><p>moonshot (Kimi, mặc định), openai, anthropic, gemini, deepseek, qwen, azure, volcengine, grok, minimax, mimo</p></div>
+  <div class="card"><h4>Gateway / tổng hợp</h4><p>OpenRouter, AIHubMix, Shengsuan Cloud, APIMart, Infistar, Jalapeno, OFox, Cloudflare AI Gateway, LiteLLM, OneAPI, Groq…</p></div>
+  <div class="card"><h4>Đăng nhập bằng gói thuê bao</h4><p><code>claude_code</code>, OpenAI-Codex (ChatGPT, đăng nhập bằng mã thiết bị), ChatGPT Native OAuth, Kimi Code</p></div>
+  <div class="card"><h4>Chạy local</h4><p>Ollama (<code>ollama_model_name</code>), hoặc bất kỳ endpoint tương thích OpenAI</p></div>
+</div>
+<pre class="prompt"><button class="copy">Sao chép</button>Đọc app/models/llm_provider.py và phần LLM trong config.example.toml. Đổi config.toml sang dùng DeepSeek: tôi sẽ tự điền deepseek_api_key, bạn chỉ sửa llm_provider. Sau đó chạy cli.py --stop-at script với chủ đề thử để kiểm tra kết nối. Không in key ra màn hình.</pre>
+</section>
+
+<!-- 9 -->
+<section id="footage">
+<h2><span class="num">9</span>Nguồn hình ảnh / video (<code>--video-source</code>)</h2>
+<table>
+  <tr><th>Giá trị</th><th>Loại</th><th>Chi phí</th><th>Ghi chú</th></tr>
+  <tr><td><code>pexels</code></td><td>Kho footage</td><td>Miễn phí (cần key)</td><td>Mặc định</td></tr>
+  <tr><td><code>pixabay</code>, <code>coverr</code></td><td>Kho footage</td><td>Miễn phí / có key</td><td></td></tr>
+  <tr><td><code>local</code></td><td>Ảnh/video của bạn</td><td>Miễn phí</td><td>Kèm <code>--video-materials a.mp4,b.jpg</code></td></tr>
+  <tr><td><code>volcengine_seedance</code></td><td>Video AI</td><td>Trả phí</td><td><code>--confirm-seedance-charge</code></td></tr>
+  <tr><td><code>wavespeed</code></td><td>Video AI</td><td>Trả phí</td><td><code>--confirm-wavespeed-charge</code></td></tr>
+  <tr><td><code>ofox</code></td><td>Video AI (Seedance, Wan…)</td><td>Trả phí</td><td><code>--confirm-ofox-charge</code></td></tr>
+  <tr><td><code>metaso_minimax</code></td><td>MiniMax H3 768P/2K, clip 4–15 giây</td><td>Trả phí</td><td><code>--confirm-metaso-minimax-charge</code></td></tr>
+  <tr><td><code>muapi</code></td><td>Video AI 3–12 giây</td><td>Trả phí</td><td><code>--confirm-muapi-charge</code></td></tr>
+  <tr><td><code>infistar</code>, <code>jalapeno</code></td><td>Video AI</td><td>Trả phí</td><td><code>--confirm-infistar-charge</code> / <code>--confirm-jalapeno-charge</code></td></tr>
+  <tr><td><code>openai_image</code></td><td>Ảnh AI → clip động</td><td>Tuỳ endpoint</td><td>Có thể tự host trên GPU: <code>docs/local-image-server</code></td></tr>
+  <tr><td><code>codex_image</code></td><td>Ảnh AI qua gói ChatGPT</td><td>Theo gói</td><td>Xem <code>docs/codex-provider.md</code></td></tr>
+</table>
+<pre class="prompt"><button class="copy">Sao chép</button>Tôi có thư mục ./clips chứa video sản phẩm của mình. Tạo video quảng cáo 16:9 dùng --video-source local với tất cả file trong thư mục đó, kịch bản tiếng Việt giới thiệu sản phẩm "Bình giữ nhiệt EcoCup", --video-concat-mode sequential, --video-fit-mode contain.</pre>
+<div class="callout ok"><strong>Mẹo: footage khớp nội dung hơn</strong>Footage từ kho đôi khi lệch nội dung. Có thể dùng <code>openai_image</code> với server ảnh local trong <code>docs/local-image-server</code> (RealVisXL, khoảng 4 giây/ảnh trên GPU 16 GB) để mỗi đoạn kịch bản có một ảnh riêng mà không tốn tiền theo ảnh.</div>
+</section>
+
+<!-- 10 -->
+<section id="audio">
+<h2><span class="num">10</span>Giọng đọc và nhạc nền</h2>
+<h3>Giọng đọc (TTS)</h3>
+<ul>
+  <li><b>Edge TTS</b> (miễn phí, không cần key; trong WebUI tên là “Azure TTS V1”). Giọng tiếng Việt: <code>vi-VN-HoaiMyNeural-Female</code>, <code>vi-VN-NamMinhNeural-Male</code>. Danh sách đầy đủ: <code>docs/voice-list.txt</code>.</li>
+  <li>Các provider khác dùng tiền tố: <code>gemini:</code>, <code>mimo:</code>, <code>elevenlabs:</code>, <code>chatterbox:</code>, <code>kokoro:</code>, <code>voxcpm:</code>. Ngoài ra còn Azure TTS V2, SiliconFlow, MiniMax, Fish Audio (cấu hình trong các mục <code>[azure]</code>, <code>[siliconflow]</code>, <code>[minimax_tts]</code>, <code>[elevenlabs]</code>, <code>[fish_audio]</code>, <code>[voxcpm]</code>…).</li>
+  <li><code>--voice-name no-voice</code>: video không lồng tiếng. <code>--custom-audio-file</code>: dùng giọng bạn tự thu.</li>
+  <li>ElevenLabs: tốc độ đọc phụ thuộc model. <code>eleven_multilingual_v2</code> cho phép 0.7–1.2×, <code>eleven_v3</code> cho phép 0.25–4.0×.</li>
+</ul>
+<h3>Nhạc nền</h3>
+<ul>
+  <li><code>random</code> (mặc định): chọn ngẫu nhiên trong <code>resource/songs</code>.</li>
+  <li><code>custom</code> + <code>--bgm-file</code>: file trong <code>storage/bgm</code> hoặc <code>resource/songs</code>.</li>
+  <li><code>sonilo</code> / <code>elevenlabs</code>: nhạc do AI sáng tác, đi kèm <code>--video-music-prompt "lofi, nhẹ nhàng"</code>. Key lấy từ <code>config.toml</code> hoặc <code>SONILO_API_KEY</code> / <code>ELEVENLABS_API_KEY</code>.</li>
+  <li><code>none</code>: không có nhạc nền.</li>
+</ul>
+<pre class="prompt"><button class="copy">Sao chép</button>Tôi có file giong-doc.mp3 tự thu. Tạo video 9:16 dùng --custom-audio-file giong-doc.mp3, bật subtitle_provider = "whisper" trong config.toml để phụ đề khớp giọng thật (hỏi tôi trước khi sửa config), nhạc nền AI bằng elevenlabs với prompt "piano ấm áp", bgm-volume 0.15.</pre>
+</section>
+
+<!-- 11 -->
+<section id="subtitle">
+<h2><span class="num">11</span>Phụ đề</h2>
+<table>
+  <tr><th>Chế độ (<code>subtitle_provider</code>)</th><th>Đặc điểm</th></tr>
+  <tr><td><code>edge</code> (mặc định)</td><td>Lấy mốc thời gian từ TTS, nhanh, không cần GPU</td></tr>
+  <tr><td><code>whisper</code></td><td>Nhận dạng bằng <code>faster-whisper</code> chạy local, chính xác hơn, bắt buộc khi dùng file giọng tự thu. Model <code>large-v3</code> khoảng 3 GB, <code>large-v3-turbo</code> khoảng 1.6 GB</td></tr>
+</table>
+<pre><span class="label">config.toml</span><button class="copy">Sao chép</button><code>[app]
+subtitle_provider = "whisper"
+
+[whisper]
+model_size = "large-v3-turbo"</code></pre>
+<p>Font hỗ trợ tiếng Việt có sẵn trong <code>resource/fonts</code>: <code>BeVietnamPro-Bold.ttf</code>, <code>BeVietnamPro-Medium.ttf</code>, <code>Charm-Bold.ttf</code>, <code>Charm-Regular.ttf</code>, <code>UTM Kabel KT.ttf</code>. Bạn có thể chép thêm font của mình vào thư mục này.</p>
+<p>Phong cách “TikTok”: <code>--subtitle-display-mode word_by_word --subtitle-animation pop_spring --subtitle-position two_thirds_bottom --stroke-width 2</code>.</p>
+</section>
+
+<!-- 12 -->
+<section id="webui-api">
+<h2><span class="num">12</span>WebUI và REST API</h2>
+<h3>Khởi chạy</h3>
+<pre><button class="copy">Sao chép</button><code>sh webui.sh                 # macOS/Linux (Windows: webui.bat) → http://127.0.0.1:8501
+uv run python main.py       # API → http://127.0.0.1:8080/docs
+docker compose -f docker-compose.release.yml up   # cả hai bằng Docker</code></pre>
+<p>WebUI có thêm: xem trước giọng đọc, lịch sử task, nhập/xuất bộ cấu hình và key, tải ảnh/video local lên, đăng nhập OAuth (Codex, ChatGPT, Kimi), nhân bản giọng nói VoxCPM, cùng phần chẩn đoán log (<i>Cài đặt → Giao diện → Diagnostic logging</i>).</p>
+<h3>Các endpoint chính (tiền tố <code>/api/v1</code>)</h3>
+<table>
+  <tr><th>Method</th><th>Đường dẫn</th><th>Chức năng</th></tr>
+  <tr><td>POST</td><td><code>/videos</code></td><td>Tạo video hoàn chỉnh (body = <code>VideoParams</code>)</td></tr>
+  <tr><td>POST</td><td><code>/audio</code>, <code>/subtitle</code></td><td>Chỉ tạo âm thanh / phụ đề</td></tr>
+  <tr><td>POST</td><td><code>/scripts</code>, <code>/terms</code>, <code>/social-metadata</code></td><td>Sinh kịch bản, từ khoá, tiêu đề/mô tả mạng xã hội</td></tr>
+  <tr><td>GET / DELETE</td><td><code>/tasks</code>, <code>/tasks/{task_id}</code></td><td>Liệt kê, xem trạng thái, xoá task</td></tr>
+  <tr><td>GET / POST</td><td><code>/musics</code>, <code>/video_materials</code></td><td>Liệt kê / tải lên nhạc nền và footage local</td></tr>
+  <tr><td>GET</td><td><code>/stream/{path}</code>, <code>/download/{path}</code></td><td>Phát trực tiếp / tải file kết quả</td></tr>
+</table>
+<pre><button class="copy">Sao chép</button><code>curl -s -X POST http://127.0.0.1:8080/api/v1/videos \
+  -H "Content-Type: application/json" \
+  -d '{"video_subject":"Mẹo học tiếng Anh mỗi ngày","video_language":"vi","voice_name":"vi-VN-HoaiMyNeural-Female","video_aspect":"9:16"}'
+# → nhận task_id, sau đó:
+curl -s http://127.0.0.1:8080/api/v1/tasks/&lt;task_id&gt;</code></pre>
+<div class="callout"><strong>Bảo vệ API</strong>Đặt <code>api_key</code> trong <code>[app]</code> thì mọi request phải gửi header <code>x-api-key</code>. Nếu frontend nằm ở origin khác, đặt biến <code>CORS_ALLOWED_ORIGINS</code>.</div>
+<pre class="prompt"><button class="copy">Sao chép</button>Khởi động API server ở chế độ nền. Viết script Python nhỏ tên make_video.py: nhận chủ đề từ tham số, gọi POST /api/v1/videos, kiểm tra /tasks/{id} mỗi 10 giây cho tới khi xong, rồi tải video về ./output. Chạy thử với một chủ đề.</pre>
+</section>
+
+<!-- 13 -->
+<section id="publish">
+<h2><span class="num">13</span>Đăng tự động lên TikTok, Instagram, YouTube Shorts</h2>
+<p>MPT tích hợp sẵn <b>Upload-Post</b>. Khi bật, video sẽ được đăng ngay sau bước <code>video</code> (cả với CLI).</p>
+<pre><span class="label">config.toml → [app]</span><button class="copy">Sao chép</button><code>upload_post_enabled = true
+upload_post_api_key = ""            # điền key của bạn
+upload_post_username = ""
+upload_post_platforms = ["tiktok", "instagram", "youtube"]
+upload_post_auto_upload = true
+upload_post_youtube_privacy_status = "unlisted"   # public | unlisted | private
+upload_post_youtube_made_for_kids = false</code></pre>
+<div class="callout warn"><strong>Kiểm tra trước khi đăng công khai</strong>Nên để <code>auto_upload = false</code> hoặc dùng <code>unlisted</code> trong giai đoạn thử nghiệm. Hãy dặn Claude: “không bật auto upload khi chưa hỏi tôi”.</div>
+</section>
+
+<!-- 14 -->
+<section id="projects">
+<h2><span class="num">14</span>Dự án video có phiên bản (chỉnh từng cảnh)</h2>
+<p>Đây là tính năng thử nghiệm (opt-in): thay một cảnh mà <b>không cần render lại toàn bộ</b>. Bạn mô tả các cảnh trong <code>episode.json</code>, hệ thống chụp lại (snapshot) nguồn, đánh phiên bản bất biến và chỉ build lại các bước bị ảnh hưởng. Tính năng chạy hoàn toàn local, không gọi API và không tự đăng bài. Chi tiết: <code>docs/video-projects.md</code>.</p>
+<pre><button class="copy">Sao chép</button><code>P=storage/projects/my-episode
+python -m app.services.video_project --project $P revise episode.json
+python -m app.services.video_project --project $P plan
+python -m app.services.video_project --project $P render
+python -m app.services.video_project --project $P status
+python -m app.services.video_project --project $P compare OLD_REV NEW_REV</code></pre>
+<pre class="prompt"><button class="copy">Sao chép</button>Đọc docs/video-projects.md. Từ task storage/tasks/&lt;id&gt; vừa tạo, dựng episode.json với mỗi đoạn là một scene (giữ id ổn định). Sau đó thay footage của scene "opening" bằng ./new-opening.mp4, chạy revise → plan (giải thích bước nào sẽ build lại) → render.</pre>
+</section>
+
+<!-- 15 -->
+<section id="power">
+<h2><span class="num">15</span>Tối ưu Claude Code cho MoneyPrinterTurbo</h2>
+
+<h3>15.1 CLAUDE.md cho dự án</h3>
+<p>Tạo <code>CLAUDE.md</code> ở thư mục gốc repo để Claude luôn nhớ quy ước của bạn:</p>
+<pre><span class="label">CLAUDE.md</span><button class="copy">Sao chép</button><code># Quy ước làm video
+- Luôn chạy bằng: uv run python cli.py ...
+- Mặc định: --video-language vi --voice-name vi-VN-HoaiMyNeural-Female
+  --font-name BeVietnamPro-Bold.ttf --video-aspect 9:16
+  --subtitle-display-mode word_by_word --subtitle-animation pop_spring
+- Không bao giờ in nội dung config.toml hoặc API key.
+- Không thêm cờ --confirm-*-charge khi tôi chưa đồng ý chi phí.
+- Không bật upload_post_auto_upload khi chưa hỏi.
+- Kết quả: báo task_id và đường dẫn final-*.mp4 trong storage/tasks/.</code></pre>
+
+<h3>15.2 Slash command riêng</h3>
+<p>Tạo <code>.claude/commands/video.md</code>, rồi gõ <code>/video Chủ đề của bạn</code>:</p>
+<pre><span class="label">.claude/commands/video.md</span><button class="copy">Sao chép</button><code>---
+description: Tạo video ngắn tiếng Việt bằng MoneyPrinterTurbo
+argument-hint: &lt;chủ đề&gt;
+---
+1. Chạy `uv run python cli.py --video-subject "$ARGUMENTS" --stop-at script`
+   theo quy ước trong CLAUDE.md và cho tôi xem kịch bản.
+2. Chờ tôi duyệt hoặc sửa, rồi render bằng --video-script.
+3. Báo đường dẫn video và tóm tắt (thời lượng, giọng, nguồn footage).</code></pre>
+
+<h3>15.3 Giảm hỏi quyền lặp lại</h3>
+<pre><span class="label">.claude/settings.json</span><button class="copy">Sao chép</button><code>{
+  "permissions": {
+    "allow": [
+      "Bash(uv run python cli.py:*)",
+      "Bash(uv run python main.py:*)",
+      "Bash(python -m app.services.video_project:*)"
+    ],
+    "deny": ["Read(./config.toml)"]
+  }
+}</code></pre>
+<div class="callout"><strong>Lưu ý về <code>deny Read(config.toml)</code></strong>Quy tắc này ngăn Claude đọc file chứa key. Bỏ nó đi nếu bạn muốn Claude tự chỉnh cấu hình giúp mình.</div>
+
+<h3>15.4 Tự động hoá không cần tương tác</h3>
+<pre><button class="copy">Sao chép</button><code>claude -p "Tạo video về 'Tin công nghệ nổi bật tuần này' theo CLAUDE.md, in đường dẫn MP4" \
+  --allowedTools "Bash(uv run python cli.py:*)" "Read" "Write"</code></pre>
+<p>Kết hợp với cron hoặc lệnh <code>/loop</code> của Claude Code để sản xuất định kỳ, ví dụ mỗi sáng một video.</p>
+
+<h3>15.5 Chia việc cho subagent</h3>
+<pre class="prompt"><button class="copy">Sao chép</button>Dùng subagent để nghiên cứu và viết 10 kịch bản (mỗi kịch bản khoảng 120 từ, tiếng Việt, có câu mở đầu gây tò mò) về chủ đề "sức khoẻ tinh thần". Gom lại thành tasks.json, trong đó mỗi task dùng video_script (không cần LLM của MPT), rồi chạy batch.</pre>
+
+<h3>15.6 Phát triển và mở rộng MPT</h3>
+<p>Repo có bộ test trong <code>test/</code>. Hãy để Claude thêm tính năng mới (ví dụ một nguồn footage hoặc provider TTS mới) và chạy <code>uv run python -m pytest test/services -q</code> để kiểm tra. Kiến trúc cần biết: <code>app/services/task.py</code> (pipeline chung của API, CLI và WebUI), <code>app/services/llm.py</code>, <code>material.py</code>, <code>voice.py</code>, <code>video.py</code>, <code>app/models/schema.py</code> (<code>VideoParams</code>).</p>
+</section>
+
+<!-- 16 -->
+<section id="troubleshoot">
+<h2><span class="num">16</span>Khắc phục sự cố</h2>
+<table>
+  <tr><th>Lỗi</th><th>Cách xử lý</th></tr>
+  <tr><td><code>No ffmpeg exe could be found</code></td><td>Cài FFmpeg rồi đặt <code>ffmpeg_path</code> trong <code>[app]</code> (trên Windows dùng <code>\\</code>)</td></tr>
+  <tr><td><code>Too many open files</code></td><td><code>ulimit -n 10240</code></td></tr>
+  <tr><td>Không tải được model Whisper</td><td>Tải <code>faster-whisper-large-v3</code> từ Hugging Face, đặt vào <code>models/whisper-large-v3</code></td></tr>
+  <tr><td><code>claude CLI not found</code> (provider <code>claude_code</code>)</td><td>Cài Claude Code ≥ 2.1.260, hoặc đặt <code>claude_code_cli_path</code></td></tr>
+  <tr><td>Footage không khớp nội dung</td><td>Thêm <code>--video-terms</code> tự chọn, bật <code>--match-materials-to-script</code>, hoặc dùng nguồn ảnh/video AI</td></tr>
+  <tr><td>Windows: lỗi đường dẫn</td><td>Tránh đường dẫn có dấu tiếng Việt, ký tự đặc biệt hoặc khoảng trắng</td></tr>
+</table>
+<pre class="prompt"><button class="copy">Sao chép</button>Task gần nhất bị lỗi. Đọc 80 dòng cuối log trong storage/tasks/&lt;task-id&gt; (hoặc stderr), xác định bước nào lỗi (script/terms/audio/subtitle/materials/video), giải thích nguyên nhân và đề xuất cách sửa. Chỉ sửa khi tôi đồng ý.</pre>
+<p>Cần log chi tiết hơn thì đặt <code>[diagnostics] log_level = "DEBUG"</code>. Lưu ý <code>log_requests = true</code> có thể ghi cả prompt vào log.</p>
+</section>
+
+<!-- 17 -->
+<section id="security">
+<h2><span class="num">17</span>Bảo mật và chi phí</h2>
+<ul>
+  <li><b>Key:</b> chỉ lưu trong <code>config.toml</code> (đã có trong <code>.gitignore</code>); không dán key vào issue hay commit. Skill được thiết kế để không bao giờ in key ra.</li>
+  <li><b>Chi phí AI video:</b> mỗi clip tạo bằng Seedance, WaveSpeed, OFox, MiniMax, MuAPI, Infistar hay Jalapeno là một task tính phí. Hãy để Claude ước tính số clip (≈ thời lượng ÷ <code>video_clip_duration</code>) trước khi xác nhận.</li>
+  <li><b>Gói Claude:</b> provider <code>claude_code</code> tiêu hao hạn mức gói thuê bao. Khi chạy batch lớn, cân nhắc model nhẹ hơn hoặc viết kịch bản sẵn.</li>
+  <li><b>API công khai:</b> luôn đặt <code>api_key</code> nếu mở cổng 8080 ra ngoài; Docker compose mặc định chỉ bind <code>127.0.0.1</code>.</li>
+  <li><b>Bản quyền:</b> nhạc mẫu trong <code>resource/songs</code> lấy từ YouTube. Nếu đăng thương mại, hãy thay bằng nhạc bạn có quyền sử dụng.</li>
+</ul>
+</section>
+
+<!-- 18 -->
+<section id="prompts">
+<h2><span class="num">18</span>Thư viện prompt dùng ngay</h2>
+<h3>Video giáo dục 16:9 từ kịch bản viết sẵn</h3>
+<pre class="prompt"><button class="copy">Sao chép</button>Viết kịch bản khoảng 200 từ giải thích "Vì sao bầu trời màu xanh" cho học sinh cấp 2, giọng văn vui. Cho tôi duyệt. Sau đó render bằng --video-script, khổ 16:9, giọng vi-VN-NamMinhNeural-Male, phụ đề ở dưới, chuyển cảnh fade-in, --video-clip-duration 4.</pre>
+<h3>Nhân bản nội dung đa ngôn ngữ</h3>
+<pre class="prompt"><button class="copy">Sao chép</button>Từ chủ đề "Ẩm thực đường phố Sài Gòn", tạo 3 video: tiếng Việt (vi-VN-HoaiMyNeural-Female), tiếng Anh (en-US-JennyNeural-Female), tiếng Nhật (ja-JP-NanamiNeural-Female). Dùng batch-file với video_language và voice_name riêng cho từng task. Kiểm tra tên giọng trong docs/voice-list.txt trước.</pre>
+<h3>Tạo tiêu đề và mô tả để đăng bài</h3>
+<pre class="prompt"><button class="copy">Sao chép</button>Khởi động API, gọi POST /api/v1/social-metadata cho kịch bản của task vừa tạo để lấy tiêu đề, mô tả và hashtag phù hợp TikTok bằng tiếng Việt. Ghi kết quả vào output/metadata.md.</pre>
+<h3>Chạy thử mà không tốn tiền</h3>
+<pre class="prompt"><button class="copy">Sao chép</button>Chạy thử với --stop-at audio cho chủ đề "Mẹo ngủ ngon" để kiểm tra LLM và giọng đọc mà chưa tải footage. Báo thời lượng file audio, rồi hỏi tôi có muốn tiếp tục render không.</pre>
+<h3>Kiểm tra sức khoẻ cấu hình</h3>
+<pre class="prompt"><button class="copy">Sao chép</button>Không in giá trị key. Hãy kiểm tra config.toml xem llm_provider, video_source, subtitle_provider đang là gì và key tương ứng đã được điền chưa (chỉ trả lời có/không). Đề xuất cấu hình tối thiểu để tạo video miễn phí.</pre>
+</section>
+
+<footer>
+  Trang này được viết dựa trên mã nguồn MoneyPrinterTurbo (README, <code>cli.py</code>, <code>config.example.toml</code>, <code>docs/skill</code>, <code>docs/video-projects.md</code>, <code>app/controllers</code>). Khi có phiên bản mới, chạy <code>uv run python cli.py --help</code> để xem tham số mới nhất. Dự án gốc: <a href="https://github.com/harry0703/MoneyPrinterTurbo">github.com/harry0703/MoneyPrinterTurbo</a> · Giấy phép MIT.
+</footer>
+</main>
+</div>
+<script>
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var btn = pre.querySelector('.copy');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var clone = pre.cloneNode(true);
+      clone.querySelectorAll('.copy,.label').forEach(function (n) { n.remove(); });
+      var text = clone.innerText.trim();
+      var done = function () { btn.textContent = 'Đã chép ✓'; setTimeout(function () { btn.textContent = 'Sao chép'; }, 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, done); else done();
+    });
+  });
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav a'));
+  var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  function onScroll() {
+    var y = window.scrollY + 120, cur = 0;
+    sections.forEach(function (s, i) { if (s && s.offsetTop <= y) cur = i; });
+    links.forEach(function (a, i) { a.classList.toggle('active', i === cur); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  links.forEach(function (a) { a.addEventListener('click', function () { document.getElementById('nav').classList.remove('open'); }); });
+</script>
+</body>
+</html>
